@@ -1,0 +1,19 @@
+[package]
+name = "falcon-bms-callbacker"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "falcon_bms_callbacker"
+path = "src/main.rs"
+
+[lib]
+name = "falcon_key_file"
+path = "src/lib/falcon-key-file/src/lib.rs"
+
+[dependencies]
+bms-sm = "=0.1.1"
+tokio = { version = "1", features = ["full"] }
+log = "0.4.22"
+env_logger = "0.11.5"
+
