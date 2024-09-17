@@ -10,6 +10,12 @@ use tokio::time::sleep;
 use std::fs::File;
 use std::path::Path;
 
+use std::env;
+
+mod udp_server;
+mod keyfile_watcher;
+
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let env = Env::default().filter_or("LOG_LEVEL", "info");
@@ -18,13 +24,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     info!("Falcon BMS Callbacker");
 
+    let addr = env::args()
+        .nth(1)
+        .unwrap_or_else(|| "0.0.0.0:2727".to_string());
+
+    
+    let server = udp_server::Server::new(&addr).await?;
+    tokio::spawn(async move {
+        let _ = server.run().await;
+    });
+
     loop {
         let string_data = StringData::read();
         if string_data.is_ok() {
             info!("BMS appears to be running...");
             break;
+        } else {
+            // debug!("BMS is not running, waiting   for a bit.")
         }
-        sleep(Duration::from_millis(200)).await;
+        sleep(Duration::from_secs(1)).await;
     }
 
     tokio::spawn(async move {
