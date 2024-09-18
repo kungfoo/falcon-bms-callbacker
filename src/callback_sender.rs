@@ -1,8 +1,14 @@
 use crate::messages::Message;
 use falcon_key_file::FalconKeyfile;
 use log::*;
+use std::ffi::CString;
 use std::io;
 use tokio::sync::mpsc::Receiver;
+
+extern crate user32;
+extern crate winapi;
+
+mod keyboard_emulator;
 
 #[derive(Debug)]
 pub struct CallbackSender {
@@ -28,6 +34,18 @@ impl CallbackSender {
                     if let Some(ref kf) = self.key_file {
                         if let Some(callback) = kf.callback(&callback) {
                             info!("Received known callback {:?}", callback);
+
+                            let window_name = CString::new("Falcon BMS").unwrap();
+
+                            unsafe {
+                                let window_handle =
+                                    user32::FindWindowA(std::ptr::null_mut(), window_name.as_ptr());
+                                // probably SetForegroundWindow is enough, it was in the other server code.
+                                user32::SetForegroundWindow(window_handle);
+                                //user32::ShowWindow(window_handle, 9);
+                            }
+
+                            keyboard_emulator::invoke(callback);
                         } else {
                             error!("Received unknown callback named '{}'", callback);
                         }

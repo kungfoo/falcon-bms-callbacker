@@ -266,7 +266,7 @@ mod falcon_key_file {
     fn parse_basic_key_file() {
         let path = Path::new("src/lib/falcon-key-file/test-data/basic.key");
         let file = File::open(&path).unwrap();
-        let result = parse(&file);
+        let result = parse(String::from("basic.key"), &file);
         assert!(result.is_ok());
 
         let result = result.unwrap();

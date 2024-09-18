@@ -16,7 +16,7 @@ pub struct Server {
 impl Server {
     pub async fn new(addr: &str, tx: Sender<Message>) -> Result<Server, io::Error> {
         let socket = UdpSocket::bind(&addr).await?;
-        debug!("Listening on: {}", socket.local_addr()?);
+        info!("Listening on: {}", socket.local_addr()?);
         Ok(Server {
             socket,
             buf: vec![0; 1024],
