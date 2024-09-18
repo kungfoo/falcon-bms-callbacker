@@ -1,20 +1,13 @@
 use log::*;
 
 use env_logger::Env;
-
-use bms_sm::StringData;
-use bms_sm::StringId;
-use std::time::Duration;
-use tokio::time::sleep;
-
-use std::fs::File;
-use std::path::Path;
-
 use std::env;
+use tokio::sync::mpsc;
 
-mod udp_server;
+mod callback_sender;
 mod keyfile_watcher;
-
+mod messages;
+mod udp_server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -28,43 +21,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .nth(1)
         .unwrap_or_else(|| "0.0.0.0:2727".to_string());
 
-    
-    let server = udp_server::Server::new(&addr).await?;
+    let (tx, rx) = mpsc::channel::<messages::Message>(32);
+
+    let server = udp_server::Server::new(&addr, tx.clone()).await?;
     tokio::spawn(async move {
         let _ = server.run().await;
     });
 
-    loop {
-        let string_data = StringData::read();
-        if string_data.is_ok() {
-            info!("BMS appears to be running...");
-            break;
-        } else {
-            // debug!("BMS is not running, waiting   for a bit.")
-        }
-        sleep(Duration::from_secs(1)).await;
-    }
-
+    let callback_sender = callback_sender::CallbackSender::new(rx).await?;
     tokio::spawn(async move {
-        loop {
-            let string_data = StringData::read().unwrap();
-            let key_file = &string_data[&StringId::KeyFile];
+        let _ = callback_sender.run().await;
+    });
 
-            if key_file.len() > 0 {
-                debug!("Key file: {:?}", key_file);
-                let path = Path::new(key_file);
-                let file = File::open(&path).unwrap();
-                match falcon_key_file::parse(&file) {
-                    Ok(key_file) => {
-                        info!("Great success reading the key file!");
-                        debug!("{:?}", key_file.callback("SimCursorStopMovement"));
-                    },
-                    Err(e) => error!("Could not read key file: {:?}", e),
-                }
-            }
-
-            sleep(Duration::from_secs(5)).await;
-        }
+    let keyfile_watcher = keyfile_watcher::KeyfileWatcher::new(tx.clone()).await?;
+    tokio::spawn(async move {
+        let _ = keyfile_watcher.run().await;
     });
 
     tokio::signal::ctrl_c().await?;

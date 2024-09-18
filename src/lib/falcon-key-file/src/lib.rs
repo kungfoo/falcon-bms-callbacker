@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 
-pub fn parse(key_file: &File) -> Result<FalconKeyFile, KeyFileError> {
+pub fn parse(name: String, key_file: &File) -> Result<FalconKeyfile, KeyFileError> {
     let reader = BufReader::new(key_file);
     let mut lines = reader.lines();
 
@@ -54,26 +54,36 @@ pub fn parse(key_file: &File) -> Result<FalconKeyFile, KeyFileError> {
         keycodes_by_callback.keys().count()
     );
 
-    Ok(FalconKeyFile::new(keycodes_by_callback))
+    Ok(FalconKeyfile::new(name, keycodes_by_callback))
 }
 
-#[derive(Debug)]
-pub struct FalconKeyFile {
+#[derive(Debug, Clone)]
+pub struct FalconKeyfile {
+    name: String,
     callbacks: HashMap<String, Callback>,
 }
 
-impl FalconKeyFile {
-    pub fn new(keycodes_by_callback: HashMap<String, Callback>) -> FalconKeyFile {
-        FalconKeyFile {
+impl FalconKeyfile {
+    pub fn new(name: String, keycodes_by_callback: HashMap<String, Callback>) -> FalconKeyfile {
+        FalconKeyfile {
+            name,
             callbacks: keycodes_by_callback,
         }
     }
 
-    pub fn callback(self: &Self, callback_name: &str) -> Option<Callback> {
+    pub fn callback(&self, callback_name: &str) -> Option<Callback> {
         match self.callbacks.get(callback_name) {
             Some(x) => Some(x.clone()),
             None => None,
         }
+    }
+
+    pub fn describe(&self) -> String {
+        format!(
+            "{} with {} callbacks.",
+            self.name,
+            self.callbacks.keys().len()
+        )
     }
 }
 
