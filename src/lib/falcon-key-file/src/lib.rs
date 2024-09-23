@@ -37,9 +37,11 @@ pub fn parse(name: String, key_file: &File) -> Result<FalconKeyfile, KeyFileErro
                 if is_key == 0 {
                     let callback = Callback {
                         name: String::from(callback_name),
-                        key_code: parse_key_code(convert_number(stuff[3])),
+                        key_code: convert_number(stuff[3]),
+                        readable_key_code: parse_key_code(convert_number(stuff[3])),
                         modifiers: parse_modifiers(convert_number(stuff[4])),
-                        combo_key_code: parse_key_code(convert_number(stuff[5])),
+                        combo_key_code: convert_number(stuff[5]),
+                        readable_combo_key_code: parse_key_code(convert_number(stuff[5])),
                         combo_modifiers: parse_modifiers(convert_number(stuff[6])),
                     };
                     trace!("Parsed callback: {:?}", callback);
@@ -89,15 +91,17 @@ impl FalconKeyfile {
 
 #[derive(Debug, Clone)]
 pub struct Callback {
-    name: String,
-    key_code: String,
-    modifiers: Vec<Modifier>,
-    combo_key_code: String,
-    combo_modifiers: Vec<Modifier>,
+    pub name: String,
+    pub key_code: u16,
+    pub readable_key_code: String,
+    pub modifiers: Vec<Modifier>,
+    pub combo_key_code: u16,
+    pub readable_combo_key_code: String,
+    pub combo_modifiers: Vec<Modifier>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum Modifier {
+pub enum Modifier {
     LSHIFT,
     LCONTROL,
     LALT,
@@ -110,20 +114,20 @@ pub enum KeyFileError<'a> {
     ParseError(&'a str),
 }
 
-fn convert_number(number: &str) -> u32 {
+fn convert_number(number: &str) -> u16 {
     let number = number.to_lowercase();
     if number.starts_with("0x") {
         let without_prefix = number.trim_start_matches("0x");
-        return u32::from_str_radix(without_prefix, 16)
-            .expect("Expected hex key code to be an i64");
+        return u32::from_str_radix(without_prefix, 16).expect("Expected hex key code to be an u16")
+            as u16;
     }
     number.parse().expect(&format!(
-        "Expected key code number to be i64 but was '{}'",
+        "Expected key code number to be u32 but was '{}'",
         number
     ))
 }
 
-fn parse_modifiers(number: u32) -> Vec<Modifier> {
+fn parse_modifiers(number: u16) -> Vec<Modifier> {
     let mut result = vec![];
     if number & 1 == 1 {
         result.push(Modifier::LSHIFT);
@@ -137,7 +141,7 @@ fn parse_modifiers(number: u32) -> Vec<Modifier> {
     result
 }
 
-fn parse_key_code(number: u32) -> String {
+fn parse_key_code(number: u16) -> String {
     let result = match number {
         1 => "ESCAPE",
         2 => "1",
@@ -242,7 +246,7 @@ fn parse_key_code(number: u32) -> String {
         220 => "RWIN",
         221 => "APPS",
         0 => "",
-        0xFFFFFFFF => "",
+        0xFFFF => "",
         e => todo!("Unmatched key code {}", e),
     };
     String::from(result)
@@ -275,18 +279,18 @@ mod falcon_key_file {
         assert!(callback.is_some());
         let callback = callback.unwrap();
         println!("{:?}", callback);
-        assert_eq!(callback.key_code, "UP");
+        assert_eq!(callback.readable_key_code, "UP");
         assert_eq!(callback.modifiers, vec![Modifier::LCONTROL]);
 
         let callback = result.callback("OTWBalanceIVCvsAIUp").unwrap();
-        assert_eq!(callback.key_code, "]");
+        assert_eq!(callback.readable_key_code, "]");
 
         let callback = result.callback("OTWBalanceIVCvsAIDown").unwrap();
-        assert_eq!(callback.key_code, "[");
+        assert_eq!(callback.readable_key_code, "[");
 
         // let's find one with multiple modifiers
         let callback = result.callback("AFElevatorUp").unwrap();
-        assert_eq!(callback.key_code, "UP");
+        assert_eq!(callback.readable_key_code, "UP");
         assert_eq!(
             callback.modifiers,
             vec![Modifier::LSHIFT, Modifier::LCONTROL]
@@ -294,18 +298,18 @@ mod falcon_key_file {
 
         // let's find a combo key
         let callback = result.callback("SimPilotToggle").unwrap();
-        assert_eq!(callback.key_code, "p");
+        assert_eq!(callback.readable_key_code, "p");
         assert!(callback.modifiers.is_empty());
 
-        assert_eq!(callback.combo_key_code, "c");
+        assert_eq!(callback.readable_combo_key_code, "c");
         assert_eq!(callback.combo_modifiers, vec![Modifier::LALT]);
 
         // let's find another combo key
         let callback = result.callback("OTWToggleFrameRate").unwrap();
-        assert_eq!(callback.key_code, "f");
+        assert_eq!(callback.readable_key_code, "f");
         assert!(callback.modifiers.is_empty());
 
-        assert_eq!(callback.combo_key_code, "c");
+        assert_eq!(callback.readable_combo_key_code, "c");
         assert_eq!(callback.combo_modifiers, vec![Modifier::LALT]);
     }
 }
