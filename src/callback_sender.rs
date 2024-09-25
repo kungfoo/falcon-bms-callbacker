@@ -44,6 +44,7 @@ impl CallbackSender {
                                 // probably SetForegroundWindow is enough, it was in the other server code.
                                 if window_handle == std::ptr::null_mut() {
                                     error!("Have not found BMS window!");
+                                    continue;
                                 }
                                 user32::SetForegroundWindow(window_handle);
                                 user32::ShowWindow(window_handle, 9);

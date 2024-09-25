@@ -1,6 +1,3 @@
-use enigo::Key::LControl;
-use enigo::Key::LMenu;
-use enigo::Key::LShift;
 use falcon_key_file::Callback;
 use falcon_key_file::Modifier;
 use log::*;
@@ -9,7 +6,7 @@ use tokio::time::Duration;
 
 use enigo::{
     Direction::{Click, Press, Release},
-    Enigo, Key, Keyboard, Settings,
+    Enigo, Keyboard, Settings,
 };
 
 pub fn invoke(callback: Callback) {
@@ -36,20 +33,22 @@ fn invoke_keycode_with_modifiers(enigo: &mut Enigo, modifiers: Vec<Modifier>, ke
     let modifiers: Vec<_> = modifiers.iter().map(to_key).collect();
 
     for modifier in modifiers.iter() {
-        enigo.key(*modifier, Press).ok();
+        enigo.raw(*modifier, Press).ok();
     }
     thread::sleep(Duration::from_millis(50));
     enigo.raw(key_code, Click).ok();
 
     for modifier in modifiers.iter().rev() {
-        enigo.key(*modifier, Release).ok();
+        enigo.raw(*modifier, Release).ok();
     }
 }
 
-fn to_key(m: &Modifier) -> Key {
+fn to_key(m: &Modifier) -> u16 {
     match m {
-        Modifier::LSHIFT => LShift,
-        Modifier::LCONTROL => LControl,
-        Modifier::LALT => LMenu,
+        // we're going straight to the raw scancode for these, as per here:
+        // https://gist.github.com/arithex/3e953d1eb096afe58ce05ba6846493e4
+        Modifier::LSHIFT => 0x2A,
+        Modifier::LCONTROL => 0x1D,
+        Modifier::LALT => 0x38,
     }
 }
