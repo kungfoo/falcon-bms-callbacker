@@ -14,6 +14,11 @@ This should be fairly simple to implement in any language from any networked dev
 
 Hell, we could even build a customizable BMS button box mobile app with it.
 
+## How do I run this?
+
+- Download the latest release from here: https://github.com/kungfoo/falcon-bms-callbacker/releases
+- Unzip it anywhere on your machine.
+- Run it. Windows will probably ask for your permission to connect to the network.
 
 ## What about when I change the key bindings?
 
