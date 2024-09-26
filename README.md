@@ -7,8 +7,13 @@ Falcon BMS Callbacker allows you to invoke BMS callbacks by simply sending them 
 Givent that BMS runs on the host with the IP address `192.168.1.212`, you can now invoke a callback like this:
 
 ```
-echo 'SimStepMasterArm' | nc -u 192.168.1.212 2727
+echo 'SimStepMasterArm' | nc -u 192.168.1.212 9027
 ```
+
+This should be fairly simple to implement in any language from any networked device you might use in a cockpit build like an arduino or raspberry pi.
+
+Hell, we could even build a customizable BMS button box mobile app with it.
+
 
 ## What about when I change the key bindings?
 
@@ -19,7 +24,7 @@ echo 'SimStepMasterArm' | nc -u 192.168.1.212 2727
 You can change that in the config file `config.toml`:
 
 ```
-listen_port = "0.0.0.0"
+listen_port = "9032"
 ```
 
 ## What if I want to bind to a different address?
