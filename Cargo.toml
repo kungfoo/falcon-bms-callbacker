@@ -22,6 +22,7 @@ user32-sys = "*"
 enigo = "0.2.1"
 seahash = "4.1.0"
 levenshtein = "1.0.5"
+config = { version = "0.14.0", features = ["toml"] }
 
 
 [profile.release]

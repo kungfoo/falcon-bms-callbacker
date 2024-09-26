@@ -51,6 +51,8 @@ impl KeyfileWatcher {
                                 debug!("Key file contents changed, re-reading it.");
                                 Self::read_key_file_and_send_result(file_name, &file, &tx).await;
                                 last_hash = Some(hash);
+                            } else {
+                                trace!("Keyfile unchanged, hash: {}", hash);
                             }
                         }
                         None => {

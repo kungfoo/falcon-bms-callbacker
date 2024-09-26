@@ -1,0 +1,3 @@
+log_level = "info"
+listen_address = "0.0.0.0"
+listen_port = 9027
