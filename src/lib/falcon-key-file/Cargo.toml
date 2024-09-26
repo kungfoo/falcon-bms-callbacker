@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 log = "*"
+levenshtein = "1.0.5"

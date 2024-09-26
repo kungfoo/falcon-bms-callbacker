@@ -34,7 +34,7 @@ impl CallbackSender {
                 Message::CallbackReceived { callback } => {
                     if let Some(ref kf) = self.key_file {
                         if let Some(callback) = kf.callback(&callback) {
-                            info!("Received known callback {:?}", callback);
+                            info!("Received {:?}", callback);
 
                             let window_name = CString::new("Falcon BMS").unwrap();
 
@@ -52,7 +52,8 @@ impl CallbackSender {
                             thread::sleep(Duration::from_millis(30));
                             keyboard_emulator::invoke(callback);
                         } else {
-                            error!("Received unknown callback named '{}'", callback);
+                            error!("Received unknown callback '{}'", callback);
+                            error!("Did you mean {:?}?", kf.propose_callback_names(callback, 3));
                         }
                     }
                 }

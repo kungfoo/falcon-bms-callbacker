@@ -21,6 +21,8 @@ winapi = "*"
 user32-sys = "*"
 enigo = "0.2.1"
 seahash = "4.1.0"
+levenshtein = "1.0.5"
+
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.

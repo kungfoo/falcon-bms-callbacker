@@ -1,3 +1,4 @@
+use levenshtein::levenshtein;
 use log::*;
 use std::collections::HashMap;
 use std::fs::File;
@@ -86,6 +87,13 @@ impl FalconKeyfile {
             self.name,
             self.callbacks.keys().len()
         )
+    }
+
+    pub fn propose_callback_names(&self, query: String, count: usize) -> Vec<String> {
+        let mut names: Vec<_> = self.callbacks.keys().cloned().collect();
+        names.sort_by(|a, b| levenshtein(&query, a).cmp(&levenshtein(&query, b)));
+
+        return names.iter().take(count).map(|s| String::from(s)).collect();
     }
 }
 
