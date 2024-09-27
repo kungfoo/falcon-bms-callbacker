@@ -4,7 +4,7 @@
 
 Falcon BMS Callbacker allows you to invoke BMS callbacks by simply sending them as a UDP datagram.
 
-Givent that BMS runs on the host with the IP address `192.168.1.212`, you can now invoke a callback like this:
+Given that BMS runs on the host with the IP address `192.168.1.212`, you can now invoke a callback like this:
 
 ```
 echo 'SimStepMasterArm' | nc -u 192.168.1.212 9027
@@ -22,7 +22,7 @@ Hell, we could even build a customizable BMS button box mobile app with it.
 
 ## What about when I change the key bindings?
 
-`falcon-bms-callbacker` will watch your keyfile for changes and reload it automatically.
+`falcon-bms-callbacker` will watch your keyfile for changes and reload it automatically (it might take a few seconds to detect).
 
 ## What if I want to listen on a different port?
 
