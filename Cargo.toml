@@ -2,6 +2,11 @@
 name = "falcon-bms-callbacker"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
+
+[build-dependencies]
+vergen-git2 = { version = "1.0.0", features = ["build", "cargo", "rustc", "si"] }
+anyhow = "*"
 
 [[bin]]
 name = "falcon_bms_callbacker"
@@ -10,7 +15,6 @@ path = "src/main.rs"
 [lib]
 name = "falcon_key_file"
 path = "src/lib/falcon-key-file/src/lib.rs"
-
 
 [dependencies]
 bms-sm = { version = "*", path = "src/lib/bms-rs" }
