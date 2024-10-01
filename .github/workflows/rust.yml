@@ -44,3 +44,5 @@ jobs:
 
         Copy-Item ".\target\x86_64-pc-windows-msvc\release\falcon_bms_callbacker.exe" -Destination ".\target\package\win64\"
         Copy-Item ".\target\i686-pc-windows-msvc\release\falcon_bms_callbacker.exe" -Destination ".\target\package\win32\"
+
+        tree target\package /F
