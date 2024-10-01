@@ -23,7 +23,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let env = Env::default().filter_or("LOG_LEVEL", config.get_string("log_level").unwrap());
     env_logger::init_from_env(env);
 
-    info!("Falcon BMS Callbacker");
+    let version = option_env!("VERGEN_GIT_DESCRIBE").unwrap_or("Could not determine version!");
+
+    info!("Falcon BMS Callbacker version: {}", version);
     debug!(
         "Config is: {:?}",
         config
