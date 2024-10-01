@@ -30,6 +30,17 @@ jobs:
         ref: ${{ github.ref }}
         submodules: recursive
     - name: Build for x64
-      run: cargo build --release --target=x86_64-pc-windows-gnu
+      run: rustup target add stable-x86_64-pc-windows-msvc && cargo build --release --target=x86_64-pc-windows-msvc
     - name: Build for i686
       run: rustup target add i686-pc-windows-msvc && cargo build --release --target=i686-pc-windows-msvc
+    - name: Package binaries
+      shell: pwsh
+      run: |
+        New-Item -Name ".\target\package\win64" -Type Directory
+        New-Item -Name ".\target\package\win32" -Type Directory
+
+        Copy-Item "config-release.toml" -Destination ".\target\package\win64\config.toml"
+        Copy-Item "config-release.toml" -Destination ".\target\package\win32\config.toml"
+
+        Copy-Item ".\target\x86_64-pc-windows-msvc\release\falcon_bms_callbacker.exe" -Destination ".\target\package\win64\"
+        Copy-Item ".\target\i686-pc-windows-msvc\release\falcon_bms_callbacker.exe" -Destination ".\target\package\win32\"
