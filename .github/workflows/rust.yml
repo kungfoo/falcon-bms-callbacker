@@ -30,7 +30,7 @@ jobs:
         ref: ${{ github.ref }}
         submodules: recursive
     - name: Build for x64
-      run: rustup target add stable-x86_64-pc-windows-msvc && cargo build --release --target=x86_64-pc-windows-msvc
+      run: cargo build --release --target=x86_64-pc-windows-msvc
     - name: Build for i686
       run: rustup target add i686-pc-windows-msvc && cargo build --release --target=i686-pc-windows-msvc
     - name: Package binaries
