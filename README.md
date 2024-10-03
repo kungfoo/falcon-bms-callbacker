@@ -4,7 +4,7 @@
 
 Falcon BMS Callbacker allows you to invoke BMS callbacks by simply sending them as a UDP datagram.
 
-Given that BMS runs on the host with the IP address `192.168.1.212`, you can now invoke a callback like this:
+Given that BMS _and this program_ both run on the host with the IP address `192.168.1.212`, you can now invoke a callback like this:
 
 ```
 echo 'SimStepMasterArm' | nc -u 192.168.1.212 9027
