@@ -21,7 +21,7 @@ cp target/i686-pc-windows-msvc/release/falcon_bms_callbacker.exe target/package/
 cp config-release.toml target/package/win32/config.toml
 
 pushd target/package/win32/
-zip -9 falcon_bms_callbacker-win32-${version}.zip *
+gzip -9 falcon_bms_callbacker-win32-${version}.zip *
 popd
 
 
