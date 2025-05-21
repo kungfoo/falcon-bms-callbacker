@@ -263,6 +263,8 @@ fn parse_key_code(number: u16) -> String {
 #[cfg(test)]
 mod falcon_key_file {
     use super::*;
+    use env_logger;
+    use env_logger::Env;
     use std::path::Path;
 
     #[test]
@@ -319,5 +321,33 @@ mod falcon_key_file {
 
         assert_eq!(callback.readable_combo_key_code, "c");
         assert_eq!(callback.combo_modifiers, vec![Modifier::LALT]);
+    }
+
+    #[test]
+    fn parse_t16000m_key_file() {
+        let env = Env::default().filter_or("LOG_LEVEL", "debug");
+        env_logger::init_from_env(env);
+
+        let path = Path::new("src/lib/falcon-key-file/test-data/T16000M-FCS-Full.key");
+        let file = File::open(&path).unwrap();
+        let result = parse(String::from("T16000M-FCS-Full.key"), &file);
+        assert!(result.is_ok());
+
+        let result = result.unwrap();
+
+        // find one callback with SLASH
+        let callback = result.callback("SimMissileStep");
+        assert!(callback.is_some());
+        let callback = callback.unwrap();
+        println!("{:?}", callback);
+        assert_eq!(callback.readable_key_code, "/");
+        assert_eq!(callback.modifiers, vec![Modifier::LSHIFT]);
+
+        // let's find the problematic new ones
+        let callback = result.callback("SimMIDSLVTInc");
+        assert!(callback.is_some());
+        let callback = callback.unwrap();
+        assert_eq!(callback.readable_key_code, "/");
+        assert_eq!(callback.modifiers, vec![Modifier::LSHIFT, Modifier::LALT]);
     }
 }
