@@ -1,3 +1,4 @@
+use enigo::Key;
 use falcon_key_file::Callback;
 use falcon_key_file::Modifier;
 use log::*;
@@ -22,21 +23,21 @@ pub fn invoke(callback: Callback) {
         invoke_keycode_with_modifiers(
             &mut enigo,
             callback.combo_modifiers,
-            callback.combo_key_code,
+            callback.readable_combo_key_code,
         );
         thread::sleep(Duration::from_millis(30));
     }
-    invoke_keycode_with_modifiers(&mut enigo, callback.modifiers, callback.key_code);
+    invoke_keycode_with_modifiers(&mut enigo, callback.modifiers, callback.readable_key_code);
 }
 
-fn invoke_keycode_with_modifiers(enigo: &mut Enigo, modifiers: Vec<Modifier>, key_code: u16) {
+fn invoke_keycode_with_modifiers(enigo: &mut Enigo, modifiers: Vec<Modifier>, key: Key) {
     let modifiers: Vec<_> = modifiers.iter().map(to_key).collect();
 
     for modifier in modifiers.iter() {
         enigo.raw(*modifier, Press).ok();
     }
     thread::sleep(Duration::from_millis(50));
-    enigo.raw(key_code, Click).ok();
+    enigo.key(key, Click).ok();
 
     for modifier in modifiers.iter().rev() {
         enigo.raw(*modifier, Release).ok();

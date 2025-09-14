@@ -1,3 +1,4 @@
+use enigo::Key;
 use levenshtein::levenshtein;
 use log::*;
 use std::collections::HashMap;
@@ -5,7 +6,7 @@ use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 
-pub fn parse(name: String, key_file: &File) -> Result<FalconKeyfile, KeyFileError> {
+pub fn parse(name: String, key_file: &'_ File) -> Result<FalconKeyfile, KeyFileError<'_>> {
     let reader = BufReader::new(key_file);
     let mut lines = reader.lines();
 
@@ -101,10 +102,10 @@ impl FalconKeyfile {
 pub struct Callback {
     pub name: String,
     pub key_code: u16,
-    pub readable_key_code: String,
+    pub readable_key_code: Key,
     pub modifiers: Vec<Modifier>,
     pub combo_key_code: u16,
-    pub readable_combo_key_code: String,
+    pub readable_combo_key_code: Key,
     pub combo_modifiers: Vec<Modifier>,
 }
 
@@ -149,115 +150,117 @@ fn parse_modifiers(number: u16) -> Vec<Modifier> {
     result
 }
 
-fn parse_key_code(number: u16) -> String {
-    let result = match number {
-        1 => "ESCAPE",
-        2 => "1",
-        3 => "2",
-        4 => "3",
-        5 => "4",
-        6 => "5",
-        7 => "6",
-        8 => "7",
-        9 => "8",
-        10 => "9",
-        11 => "0",
-        12 => "-",
-        13 => "=",
-        14 => "BACKSPACE",
-        15 => "TAB",
-        16 => "q",
-        17 => "w",
-        18 => "e",
-        19 => "r",
-        20 => "t",
-        21 => "y",
-        22 => "u",
-        23 => "i",
-        24 => "o",
-        25 => "p",
-        26 => "[",
-        27 => "]",
-        28 => "RETURN",
-        29 => "`",
-        30 => "a",
-        31 => "s",
-        32 => "d",
-        33 => "f",
-        34 => "g",
-        35 => "h",
-        36 => "j",
-        37 => "k",
-        38 => "l",
-        39 => ";",
-        40 => "'",
-        41 => "`",
-        43 => "\\",
-        44 => "z",
-        45 => "x",
-        46 => "c",
-        47 => "v",
-        48 => "b",
-        49 => "n",
-        50 => "m",
-        51 => ",",
-        52 => ".",
-        53 => "/",
-        55 => "MULTIPLY",
-        57 => "SPACE",
-        58 => "CAPSLOCK",
-        59 => "F1",
-        60 => "F2",
-        61 => "F3",
-        62 => "F4",
-        63 => "F5",
-        64 => "F6",
-        65 => "F7",
-        66 => "F8",
-        67 => "F9",
-        68 => "F10",
-        69 => "NUMLOCK",
-        70 => "SCROLLOCK",
-        71 => "NUMPAD7",
-        72 => "NUMPAD8",
-        73 => "NUMPAD9",
-        74 => "SUBTRACT",
-        75 => "NUMPAD4",
-        76 => "NUMPAD5",
-        77 => "NUMPAD6",
-        78 => "ADD",
-        79 => "NUMPAD1",
-        80 => "NUMPAD2",
-        81 => "NUMPAD3",
-        82 => "NUMPAD0",
-        83 => "DECIMAL",
-        87 => "F11",
-        88 => "F12",
-        100 => "F13",
-        101 => "F14",
-        102 => "F15",
-        156 => "NUMPADENTER",
-        157 => "RCONTROL",
-        181 => "DIVIDE",
-        183 => "SYSRQ",
-        199 => "HOME",
-        200 => "UP",
-        201 => "PAGEUP",
-        203 => "LEFT",
-        205 => "RIGHT",
-        207 => "END",
-        208 => "DOWN",
-        209 => "PAGEDOWN",
-        210 => "INSERT",
-        211 => "DELETE",
-        219 => "LWIN",
-        220 => "RWIN",
-        221 => "APPS",
-        0 => "",
-        0xFFFF => "",
+fn parse_key_code(number: u16) -> Key {
+    return match number {
+        // these are maric unicorns in keyfiles
+        0 => Key::Other(0),
+        0xFFFF => Key::Other(0),
+        // normal ones start here:
+        1 => Key::Escape,
+        2 => Key::Num1,
+        3 => Key::Num2,
+        4 => Key::Num3,
+        5 => Key::Num4,
+        6 => Key::Num5,
+        7 => Key::Num6,
+        8 => Key::Num7,
+        9 => Key::Num8,
+        10 => Key::Num9,
+        11 => Key::Num0,
+        12 => Key::Unicode('-'),
+        13 => Key::Unicode('='),
+        14 => Key::Backspace,
+        15 => Key::Tab,
+        16 => Key::Q,
+        17 => Key::W,
+        18 => Key::E,
+        19 => Key::R,
+        20 => Key::T,
+        21 => Key::Y,
+        22 => Key::U,
+        23 => Key::I,
+        24 => Key::O,
+        25 => Key::P,
+        26 => Key::Unicode('['),
+        27 => Key::Unicode(']'),
+        28 => Key::Return,
+        29 => Key::LControl,
+        30 => Key::A,
+        31 => Key::S,
+        32 => Key::D,
+        33 => Key::F,
+        34 => Key::G,
+        35 => Key::H,
+        36 => Key::J,
+        37 => Key::L,
+        38 => Key::L,
+        39 => Key::Unicode(';'),
+        40 => Key::Unicode('\''),
+        41 => Key::Unicode('`'),
+        42 => Key::LShift,
+        43 => Key::Unicode('\\'),
+        44 => Key::Z,
+        45 => Key::X,
+        46 => Key::C,
+        47 => Key::V,
+        48 => Key::B,
+        49 => Key::N,
+        50 => Key::M,
+        51 => Key::Unicode(','),
+        52 => Key::Unicode('.'),
+        53 => Key::Unicode('/'),
+        55 => Key::Multiply,
+        57 => Key::Space,
+        58 => Key::CapsLock,
+        59 => Key::F1,
+        60 => Key::F2,
+        61 => Key::F3,
+        62 => Key::F4,
+        63 => Key::F5,
+        64 => Key::F6,
+        65 => Key::F7,
+        66 => Key::F8,
+        67 => Key::F9,
+        68 => Key::F10,
+        69 => Key::Numlock,
+        70 => Key::Scroll,
+        71 => Key::Numpad7,
+        72 => Key::Numpad8,
+        73 => Key::Numpad9,
+        74 => Key::Subtract,
+        75 => Key::Numpad4,
+        76 => Key::Numpad5,
+        77 => Key::Numpad6,
+        78 => Key::Add,
+        79 => Key::Numpad1,
+        80 => Key::Numpad2,
+        81 => Key::Numpad3,
+        82 => Key::Numpad0,
+        83 => Key::Decimal,
+        87 => Key::F11,
+        88 => Key::F12,
+        100 => Key::F13,
+        101 => Key::F14,
+        102 => Key::F15,
+        156 => Key::Separator,
+        157 => Key::RControl,
+        181 => Key::Divide,
+        183 => Key::PrintScr,
+        199 => Key::Home,
+        200 => Key::UpArrow,
+        201 => Key::PageUp,
+        203 => Key::LeftArrow,
+        205 => Key::RightArrow,
+        207 => Key::End,
+        208 => Key::DownArrow,
+        209 => Key::PageDown,
+        210 => Key::Insert,
+        211 => Key::Delete,
+        219 => Key::LWin,
+        220 => Key::RWin,
+        221 => Key::Apps,
         e => todo!("Unmatched key code {}", e),
     };
-    String::from(result)
 }
 
 #[cfg(test)]
@@ -289,18 +292,22 @@ mod falcon_key_file {
         assert!(callback.is_some());
         let callback = callback.unwrap();
         println!("{:?}", callback);
-        assert_eq!(callback.readable_key_code, "UP");
+        assert_eq!(callback.readable_key_code, Key::UpArrow);
         assert_eq!(callback.modifiers, vec![Modifier::LCONTROL]);
 
+        let callback = result.callback("AFBrakesToggle").unwrap();
+        assert_eq!(callback.readable_key_code, Key::B);
+        assert_eq!(callback.modifiers, vec![]);
+
         let callback = result.callback("OTWBalanceIVCvsAIUp").unwrap();
-        assert_eq!(callback.readable_key_code, "]");
+        assert_eq!(callback.readable_key_code, Key::Unicode(']'));
 
         let callback = result.callback("OTWBalanceIVCvsAIDown").unwrap();
-        assert_eq!(callback.readable_key_code, "[");
+        assert_eq!(callback.readable_key_code, Key::Unicode('['));
 
         // let's find one with multiple modifiers
         let callback = result.callback("AFElevatorUp").unwrap();
-        assert_eq!(callback.readable_key_code, "UP");
+        assert_eq!(callback.readable_key_code, Key::UpArrow);
         assert_eq!(
             callback.modifiers,
             vec![Modifier::LSHIFT, Modifier::LCONTROL]
@@ -308,18 +315,18 @@ mod falcon_key_file {
 
         // let's find a combo key
         let callback = result.callback("SimPilotToggle").unwrap();
-        assert_eq!(callback.readable_key_code, "p");
+        assert_eq!(callback.readable_key_code, Key::P);
         assert!(callback.modifiers.is_empty());
 
-        assert_eq!(callback.readable_combo_key_code, "c");
+        assert_eq!(callback.readable_combo_key_code, Key::C);
         assert_eq!(callback.combo_modifiers, vec![Modifier::LALT]);
 
         // let's find another combo key
         let callback = result.callback("OTWToggleFrameRate").unwrap();
-        assert_eq!(callback.readable_key_code, "f");
+        assert_eq!(callback.readable_key_code, Key::F);
         assert!(callback.modifiers.is_empty());
 
-        assert_eq!(callback.readable_combo_key_code, "c");
+        assert_eq!(callback.readable_combo_key_code, Key::C);
         assert_eq!(callback.combo_modifiers, vec![Modifier::LALT]);
     }
 
@@ -340,14 +347,14 @@ mod falcon_key_file {
         assert!(callback.is_some());
         let callback = callback.unwrap();
         println!("{:?}", callback);
-        assert_eq!(callback.readable_key_code, "/");
+        assert_eq!(callback.readable_key_code, Key::Unicode('/'));
         assert_eq!(callback.modifiers, vec![Modifier::LSHIFT]);
 
         // let's find the problematic new ones
         let callback = result.callback("SimMIDSLVTInc");
         assert!(callback.is_some());
         let callback = callback.unwrap();
-        assert_eq!(callback.readable_key_code, "/");
+        assert_eq!(callback.readable_key_code, Key::Unicode('/'));
         assert_eq!(callback.modifiers, vec![Modifier::LSHIFT, Modifier::LALT]);
     }
 }
