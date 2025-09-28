@@ -20,16 +20,16 @@ log = "0.4"
 env_logger = "0.11"
 winapi = "*"
 user32-sys = "*"
-enigo = "0.6.1"
 seahash = "4.1.0"
 levenshtein = "1.0.5"
-config = { version = "0.15", features = ["toml"] }
+figment = { version = "0.10", features = ["toml"]}
 
 windows = { version = "0.62.0", features = [
     "Win32_Foundation",
     "Win32_UI_WindowsAndMessaging",
     "Win32_UI_Input_KeyboardAndMouse",
 ] }
+serde = {version = "1", features = ["derive"]}
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.

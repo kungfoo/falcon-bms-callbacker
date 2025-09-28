@@ -1,7 +1,8 @@
+use figment::providers::Format;
+use crate::config::Config;
+use figment::{providers::{Serialized, Toml}, Figment};
 use log::*;
-use std::collections::HashMap;
 
-use config::Config;
 use env_logger::Env;
 use tokio::sync::mpsc;
 
@@ -9,34 +10,28 @@ mod callback_sender;
 mod keyfile_watcher;
 mod messages;
 mod udp_server;
+mod config;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let config = Config::builder()
-        .set_default("log_level", "info")?
-        .set_default("listen_address", "0.0.0.0")?
-        .set_default("listen_port", 9027)?
-        .add_source(config::File::with_name("config"))
-        .build()
-        .unwrap();
+    let config: Config = Figment::new()
+        .merge(Serialized::defaults(Config::default()))
+        .merge(Toml::file("config.toml"))
+        .extract()
+        .expect("Failed to parse config.");
 
-    let env = Env::default().filter_or("LOG_LEVEL", config.get_string("log_level").unwrap());
+    let env = Env::default().filter_or("LOG_LEVEL", config.log_level.clone());
     env_logger::init_from_env(env);
 
     let version = option_env!("VERGEN_GIT_DESCRIBE").unwrap_or("Could not determine version!");
 
     info!("Falcon BMS Callbacker version: {}", version);
-    debug!(
-        "Config is: {:?}",
-        config
-            .clone()
-            .try_deserialize::<HashMap<String, String>>()?
-    );
+    debug!("Config is: {:?}",&config);
 
     let addr = format!(
         "{}:{}",
-        config.get_string("listen_address")?,
-        config.get_int("listen_port")?
+        config.listen_address,
+        config.listen_port
     );
 
     let (tx, rx) = mpsc::channel::<messages::Message>(32);
