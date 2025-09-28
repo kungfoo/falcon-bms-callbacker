@@ -1,3 +1,0 @@
-[submodule "src/lib/bms-rs"]
-	path = src/lib/bms-rs
-	url = https://github.com/kungfoo/bms-rs.git
