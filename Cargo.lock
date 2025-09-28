@@ -495,7 +495,7 @@ dependencies = [
 
 [[package]]
 name = "falcon-bms-callbacker"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "bms-sm",
@@ -509,7 +509,7 @@ dependencies = [
  "tokio",
  "user32-sys",
  "vergen-git2",
- "winapi 0.3.9",
+ "winapi 0.2.8",
  "windows 0.62.1",
 ]
 
