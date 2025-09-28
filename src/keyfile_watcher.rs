@@ -33,10 +33,10 @@ impl KeyfileWatcher {
                 debug!("BMS appears to be running...");
                 let key_file_path = &string_data[&StringId::KeyFile];
 
-                if key_file_path.len() > 0 {
+                if !key_file_path.is_empty() {
                     trace!("About to read key file: {:?}", key_file_path);
                     let path = Path::new(key_file_path);
-                    let mut file = File::open(&path).unwrap();
+                    let mut file = File::open(path).unwrap();
                     let file_name = String::from(path.file_name().unwrap().to_str().unwrap());
 
                     let mut buffer = Vec::new();
@@ -74,7 +74,7 @@ impl KeyfileWatcher {
         tx: &Sender<Message>,
     ) {
         file.rewind().expect("Could not seek to beginning of file.");
-        match falcon_key_file::parse(file_name, &file) {
+        match falcon_key_file::parse(file_name, file) {
             Ok(key_file) => {
                 let message = Message::KeyfileRead { key_file };
                 tx.send(message).await.unwrap();

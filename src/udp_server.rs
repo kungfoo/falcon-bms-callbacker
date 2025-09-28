@@ -37,7 +37,7 @@ impl Server {
             if let Some((_size, _peer)) = to_send {
                 let data = buf[.._size].to_vec();
                 let callback_name = String::from_utf8(data).unwrap().trim().to_string();
-                if callback_name.len() > 0 {
+                if !callback_name.is_empty() {
                     let message = Message::CallbackReceived {
                         callback: callback_name,
                     };

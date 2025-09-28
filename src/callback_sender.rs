@@ -42,14 +42,14 @@ impl CallbackSender {
                                 let window_handle =
                                     user32::FindWindowA(std::ptr::null_mut(), window_name.as_ptr());
                                 // probably SetForegroundWindow is enough, it was in the other server code.
-                                if window_handle == std::ptr::null_mut() {
+                                if window_handle.is_null() {
                                     error!("Have not found BMS window!");
                                     continue;
                                 }
                                 user32::SetForegroundWindow(window_handle);
                                 user32::ShowWindow(window_handle, 9);
                             }
-                            thread::sleep(Duration::from_millis(30));
+                            thread::sleep(Duration::from_millis(15));
                             keyboard_emulator::invoke(callback);
                         } else {
                             error!("Received unknown callback '{}'", callback);

@@ -1,7 +1,7 @@
 [package]
 name = "falcon-bms-callbacker"
-version = "0.1.0"
-edition = "2021"
+version = "0.2.0"
+edition = "2024"
 build = "build.rs"
 
 [build-dependencies]
@@ -12,12 +12,9 @@ anyhow = "*"
 name = "falcon_bms_callbacker"
 path = "src/main.rs"
 
-[lib]
-name = "falcon_key_file"
-path = "src/lib/falcon-key-file/src/lib.rs"
-
 [dependencies]
-bms-sm = { version = "*", path = "src/lib/bms-rs" }
+bms-sm = { git = "https://github.com/kungfoo/bms-rs.git", version = "0.2" }
+falcon-key-file = { git = "https://github.com/kungfoo/falcon-bms-keyfile.git", version = "0.3.0" }
 tokio = { version = "1", features = ["full"] }
 log = "0.4"
 env_logger = "0.11"
@@ -28,8 +25,13 @@ seahash = "4.1.0"
 levenshtein = "1.0.5"
 config = { version = "0.15", features = ["toml"] }
 
+windows = { version = "0.62.0", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+] }
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
-#opt-level = "z"  # Optimize for size.
-#lto = true
+opt-level = "z"  # Optimize for size.
+lto = true
