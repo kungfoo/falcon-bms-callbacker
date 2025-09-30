@@ -50,3 +50,26 @@ You can change that in the config file `config.toml`:
 # any of: info, debug, trace
 log_level = "debug"
 ```
+
+## Building it
+
+This will build on windows only (BMS is a windows application after all).
+It will also build on linux if you cross compile for `ix86_64-pc-windows-gnu`.
+
+Build using:
+
+```
+cargo build --release
+# or
+cargo build --release --target x86_64-pc-windows-gnu
+```
+
+On windows the best way to get all the tools needed to build is probably to install MSYS2 and then
+the MSYS2 x64 shell and install with `pacaman`:
+
+- base-devel
+- cargo
+- clang
+
+Clang may not be necessary, depending on what is already installed on the machine, afaict.
+

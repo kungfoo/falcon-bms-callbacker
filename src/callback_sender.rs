@@ -12,6 +12,8 @@ extern crate winapi;
 
 mod keyboard_emulator;
 
+/// Sends callbacks by pretending to be a keyboard after
+/// putting the Falcon BMS window in the foreground.
 #[derive(Debug)]
 pub struct CallbackSender {
     rx: Receiver<Message>,
